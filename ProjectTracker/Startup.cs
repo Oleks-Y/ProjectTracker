@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
@@ -41,6 +41,9 @@ namespace ProjectTracker
                     Version  = "v1",
                     Description = "Simple API"
                 });
+                
+                var filePath = Path.Combine(System.AppContext.BaseDirectory, "ProjectTracker.xml");
+                options.IncludeXmlComments(filePath);
             });
 
             services.AddEntityFrameworkNpgsql().AddDbContext<EmployeeContext>(

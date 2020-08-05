@@ -19,10 +19,13 @@ namespace ProjectTracker.Controllers
             _employeeContext = context ?? throw new ArgumentNullException(nameof(context));
         }
         
-       
+        /// <summary>
+        /// Add new user
+        /// </summary>
         [HttpPost]
         public IActionResult AddEmployee([FromBody] EmployeePost emp)
         {
+            
             if (emp.Name == null || emp.Sex == null || emp.Birthday == null)
             {
                 return NotFound("Fields can`t be empty");
@@ -40,6 +43,9 @@ namespace ProjectTracker.Controllers
             return Json(user.Entity.Id);
 
         }
+        /// <summary>
+        /// Get all user activities
+        /// </summary>
         [HttpGet("{employeeId:int}")]
         public IActionResult AllProjects(int employeeId)
         {
@@ -55,6 +61,9 @@ namespace ProjectTracker.Controllers
                     Duration = (a.Project.DateEnd - a.Project.DateStart).Hours }));
         
         }
+        /// <summary>
+        /// Get acviti by id
+        /// </summary>
         [HttpGet("{employeeId:int}/{activityId:int}")]
         public IActionResult AllProjects(int employeeId, int activityId)
         {
@@ -68,7 +77,9 @@ namespace ProjectTracker.Controllers
             return Json(_employeeContext.Activities.Where( a=> a.Employee == emp && a.Id == activityId ));
         
         }
-
+        /// <summary>
+        /// Delete activity
+        /// </summary>
         [HttpDelete("{employeeId:int}/{activityId:int}")]
         public IActionResult DeleteActivity(int employeeId, int activityId)
         {
@@ -91,6 +102,9 @@ namespace ProjectTracker.Controllers
             return Ok();
 
         }
+        /// <summary>
+        /// Add activity to user
+        /// </summary>
         [HttpPost("{employeeId:int}")]
         public IActionResult AddActivity(int employeeId, [FromBody] ProjectPost project)
         {
@@ -130,6 +144,9 @@ namespace ProjectTracker.Controllers
 
             return Ok();
         }
+        /// <summary>
+        /// Update activity
+        /// </summary>
         [HttpPut("{employeeId:int}/{activityId:int}")]
         public IActionResult PutActivity(int employeeId, int activityId, [FromBody] ProjectPost project)
         {

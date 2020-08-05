@@ -14,7 +14,10 @@ namespace ProjectTracker.Controllers
         {
             _employeeContext = context ?? throw new ArgumentNullException(nameof(context));
         }
-
+        
+        /// <summary>
+        /// Get time tracking by person id and date
+        /// </summary>
         [HttpGet("{employeeId:int}/{date:DateTime}")]
         public IActionResult TimeTracking(int employeeId, DateTime date)
         {
@@ -34,7 +37,10 @@ namespace ProjectTracker.Controllers
                     Duration = (a.Project.DateEnd - a.Project.DateStart).Hours })
             );
         }
-
+        
+        /// <summary>
+        /// Get time tracking by person by week number (in scope of the year)
+        /// </summary>
         [HttpGet("{employeeId:int}/{week:int}")]
         public IActionResult WeekTracking(int employeeId, int week)
         {
