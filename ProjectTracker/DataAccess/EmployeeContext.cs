@@ -19,24 +19,16 @@ namespace ProjectTracker.DataAccess
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             
-            // Todo Project not showing in Activity !
             modelBuilder.Entity<Employee>()
                 .HasMany(e => e.Activities)
                 .WithOne(e => e.Employee)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            
-            
 
             modelBuilder.Entity<Activity>()
                 .HasOne(a => a.Project)
                 .WithOne(p => p.Activity)
                 .HasForeignKey<Project>(p => p.ActivityForeignKey);
-            
-            
-            
-            
-
 
 
         }

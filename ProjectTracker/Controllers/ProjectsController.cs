@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json.Serialization;
 using ProjectTracker.Controllers.JsonModels;
 using ProjectTracker.DataAccess;
 using ProjectTracker.Models;
@@ -17,12 +18,8 @@ namespace ProjectTracker.Controllers
         {
             _employeeContext = context ?? throw new ArgumentNullException(nameof(context));
         }
-        //Todo Add method to get by id
-        // [HttpGet]
-        // public IActionResult Index()
-        // {
-        //     return Json(_employeeContext.Projects.ToArray());
-        // }
+        
+       
         [HttpPost]
         public IActionResult AddEmployee([FromBody] EmployeePost emp)
         {
@@ -52,7 +49,10 @@ namespace ProjectTracker.Controllers
                 return NotFound("No user");
             }
             
-            return Json(_employeeContext.Activities.Where( a=> a.Employee == emp ));
+            return Json(_employeeContext.Activities.Where( a=> a.Employee == emp )
+                    .Select(a => new {a.Id, a.Project.Name, a.Role, a.ActivityType,
+                        Employee = new { a.Employee.Id , a.Employee.Name},
+                    Duration = (a.Project.DateEnd - a.Project.DateStart).Hours }));
         
         }
         [HttpGet("{employeeId:int}/{activityId:int}")]
@@ -64,6 +64,7 @@ namespace ProjectTracker.Controllers
                 return NotFound("No user");
             }
             
+            // To do in get not return employee
             return Json(_employeeContext.Activities.Where( a=> a.Employee == emp && a.Id == activityId ));
         
         }
@@ -101,7 +102,17 @@ namespace ProjectTracker.Controllers
             }
 
             emp.Activities ??= new List<Activity>();
+            if (project.DateStart.Date != project.DateEnd.Date)
+            {
+                return NotFound("Date start and date end should be in one day");
+            }
+
+            if (project.DateEnd < project.DateStart)
+            {
+                return NotFound("Start date cannot be greater than end date");
+            }
             
+            // check project.end > projects.start
             emp.Activities.Add(new Activity()
             {
                 Project = new Project()
@@ -120,9 +131,10 @@ namespace ProjectTracker.Controllers
             return Ok();
         }
         [HttpPut("{employeeId:int}/{activityId:int}")]
-        public IActionResult AddActivity(int employeeId, int activityId, [FromBody] ProjectPost project)
+        public IActionResult PutActivity(int employeeId, int activityId, [FromBody] ProjectPost project)
         {
-            // ToDo FIX IT !!!!
+            
+            
             var emp = _employeeContext.Employees.FirstOrDefault(e => e.Id == employeeId);
 
             if (emp == null)
@@ -130,7 +142,12 @@ namespace ProjectTracker.Controllers
                 return NotFound();
             }
 
-            var activity = _employeeContext.Activities.FirstOrDefault(a => a.Id == activityId);
+            var activity = _employeeContext.Activities.FirstOrDefault(a => a.Id == activityId && a.Employee.Id == employeeId);
+
+            if (activity == null)
+            {
+                return NotFound("No activity");
+            }
 
             activity = new Activity()
             {

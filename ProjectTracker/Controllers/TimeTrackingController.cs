@@ -25,13 +25,13 @@ namespace ProjectTracker.Controllers
                 return NotFound("No user");
             }
 
-            // Todo If date in actual
-            // Todo send response with tracked hours field
+            
+            
             return Json(_employeeContext.Activities
                 .Where(a =>
                     a.Employee.Id == employeeId && a.Project.DateStart.Date == date.Date)
                 .Select(a => new {a.Id, a.Project.Name, a.Role, a.ActivityType, 
-                    Duration = (a.Project.DateStart - a.Project.DateEnd).Hours })
+                    Duration = (a.Project.DateEnd - a.Project.DateStart).Hours })
             );
         }
 
@@ -46,7 +46,7 @@ namespace ProjectTracker.Controllers
                 return NotFound("No user");
             }
 
-            // Todo If date in actual
+            
             return Json(_employeeContext.Activities
                 .Where(a =>
                     a.Employee.Id == employeeId && a.Project.DateStart.DayOfYear/7 == week)
